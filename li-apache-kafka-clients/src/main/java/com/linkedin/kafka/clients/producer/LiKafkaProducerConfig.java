@@ -48,6 +48,7 @@ public class LiKafkaProducerConfig extends AbstractConfig {
   public static final String MAX_REQUEST_SIZE_CONFIG = ProducerConfig.MAX_REQUEST_SIZE_CONFIG;
   public static final String LARGE_MESSAGE_SEGMENT_WRAPPING_REQUIRED_CONFIG =
       "li.large.message.segment.wrapping.required";
+  public static final String DELIVERY_TIMEOUT_MS_CONFIG = "delivery.timeout.ms";
 
   public static final String LARGE_MESSAGE_ENABLED_DOC = "Configure the producer to support large messages or not. " +
       "If large message is enabled, the producer will split the messages whose size is greater than " +
@@ -87,6 +88,11 @@ public class LiKafkaProducerConfig extends AbstractConfig {
       "and thus not split into multiple messages. This configuration does not have any effect if large message is " +
       "not enabled.";
 
+  public static final String DELIVERY_TIMEOUT_MS_DOC = "An upper bound on the time to report success or failure after Producer.send() returns. " +
+      "Producer may report failure to send a message earlier than this config if all the retries are exhausted or " +
+      "a record is added to a batch nearing expiration. " + DELIVERY_TIMEOUT_MS_CONFIG + "should be equal to or " +
+      "greater than " + ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG + " + " + ProducerConfig.LINGER_MS_CONFIG;
+
   static {
     // TODO: Add a default metadata service client class.
     CONFIG = new ConfigDef()
@@ -104,8 +110,8 @@ public class LiKafkaProducerConfig extends AbstractConfig {
         .define(LARGE_MESSAGE_SEGMENT_WRAPPING_REQUIRED_CONFIG, Type.BOOLEAN, "true", Importance.MEDIUM,
             LARGE_MESSAGE_SEGMENT_WRAPPING_REQUIRED_DOC)
         .define(METADATA_SERVICE_REQUEST_TIMEOUT_MS_CONFIG, Type.INT, Integer.MAX_VALUE, Importance.MEDIUM,
-            METADATA_SERVICE_REQUEST_TIMEOUT_MS_DOC);
-    ;
+            METADATA_SERVICE_REQUEST_TIMEOUT_MS_DOC)
+        .define(DELIVERY_TIMEOUT_MS_CONFIG, Type.INT, Integer.MAX_VALUE, atLeast(0), Importance.MEDIUM, DELIVERY_TIMEOUT_MS_DOC);
   }
 
   LiKafkaProducerConfig(Map<?, ?> props) {
